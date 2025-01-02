@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Трекер задач</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="header">
+        {% if logged_in %}
+            <div class="user-info">
+                <span>{{ username }}</span>
+                <a href="{{ url_for('logout') }}" class="btn">Выйти</a>
+            </div>
+        {% else %}
+            <div class="auth-buttons">
+                <button class="btn" onclick="showModal('login')">Войти</button>
+                <button class="btn" onclick="showModal('register')">Регистрация</button>
+            </div>
+        {% endif %}
+    </div>
+
+    <h1>Ежедневный трекер задач</h1>
+    
+    {% if logged_in %}
+        <div class="stats">
+            <div class="stat-box">
+                <h3>{{ streak }}</h3>
+                <p>дней подряд</p>
+            </div>
+            <div class="stat-box">
+                <h3>{{ max_streak }}</h3>
+                <p>макс. дней подряд</p>
+            </div>
+            <div class="stat-box">
+                <h3>{{ total_tasks }}</h3>
+                <p>задач выполнено</p>
+            </div>
+        </div>
+
+        <button class="btn" onclick="showModal('taskManagement')">Добавить задачу</button>
+
+        <div class="tasks" id="tasks">
+            <!-- Задачи будут добавляться динамически -->
+        </div>
+
+        <div class="contribution-graph">
+            <div class="weeks" id="weeks"></div>
+            <div class="months" id="months"></div>
+        </div>
+    {% else %}
+        <div class="login-prompt">
+            <p>Пожалуйста, войдите или зарегистрируйтесь, чтобы начать отслеживать свои задачи</p>
+        </div>
+    {% endif %}
+
+    <!-- Модальное окно для входа -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('login')">&times;</span>
+            <h2>Вход</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+                <input type="password" name="password" placeholder="Пароль" required>
+                <button type="submit" class="btn">Войти</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно для регистрации -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('register')">&times;</span>
+            <h2>Регистрация</h2>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+                <input type="password" name="password" placeholder="Пароль" required>
+                <input type="password" name="confirmPassword" placeholder="Повторите пароль" required>
+                <div id="captchaContainer">
+                    <!-- Здесь будет отображаться вопрос капчи -->
+                </div>
+                <input type="text" name="captcha" placeholder="Ответ на вопрос" required>
+                <button type="submit" class="btn">Зарегистрироваться</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно для управления задачами -->
+    <div id="taskManagementModal" class="modal">
+        <div class="task-management-content">
+            <span class="close" onclick="hideModal('taskManagement')">&times;</span>
+            <h2>Добавить задачу</h2>
+            <input type="text" id="taskInput" placeholder="Название задачи">
+            <button onclick="addTask()">Добавить</button>
+            <div id="subtasksContainer"></div>
+            <button onclick="addSubtask()">Добавить подзадачу</button>
+        </div>
+    </div>
+
+    <script>
+        const yearlyData = {{ yearly_data|tojson }};
+        const progress = {{ progress|tojson }};
+        const tasks = {{ tasks|tojson|default([], true) }};
+    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
