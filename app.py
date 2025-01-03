@@ -66,9 +66,9 @@ def get_streak(user_id):
 def get_yearly_data(user_id):
     data = load_data(user_id)
     today = date.today()
-    year_ago = today - timedelta(days=365)
+    start_date = today - timedelta(days=364)  # Последние 365 дней
     yearly_data = {}
-    current = year_ago
+    current = start_date
     
     while current <= today:
         str_date = str(current)

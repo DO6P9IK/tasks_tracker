@@ -4,30 +4,24 @@ function createWeeks() {
     const weeks = document.getElementById('weeks');
     const months = document.getElementById('months');
     const today = new Date();
-    const startOfYear = new Date(today.getFullYear(), 0, 1); // 1 января текущего года
-    const endOfYear = new Date(today.getFullYear(), 11, 31); // 31 декабря текущего года
+    const startDate = new Date(today); // Начинаем с текущей даты
+    startDate.setDate(today.getDate() - 363); // Отнимаем 363 дня, чтобы получить ровно 52 недели (364 дня)
 
-    // Добавляем пустые дни перед началом года
-    const startDayOfWeek = startOfYear.getDay(); // 0 (воскресенье) до 6 (суббота)
-    let offsetDays = (startDayOfWeek === 0) ? 6 : startDayOfWeek - 1; // Пустые квадраты для дней до понедельника
-
-    if (offsetDays > 0) {
-        const emptyWeek = document.createElement('div');
-        emptyWeek.className = 'week';
-        weeks.appendChild(emptyWeek);
-        for (let i = 0; i < offsetDays; i++) {
-            const square = document.createElement('div');
-            square.className = 'square level-0'; // Пустой квадрат
-            emptyWeek.appendChild(square);
-        }
+    // Находим ближайший понедельник перед startDate
+    while (startDate.getDay() !== 1) { // 1 — это понедельник
+        startDate.setDate(startDate.getDate() - 1);
     }
 
+    // Очищаем предыдущие данные
+    weeks.innerHTML = '';
+    months.innerHTML = '';
+
     let currentMonth = '';
-    let monthWidth = offsetDays;
+    let monthWidth = 0;
     let currentWeek;
 
-    // Проходим по всем дням года
-    for (let d = new Date(startOfYear); d <= endOfYear; d.setDate(d.getDate() + 1)) {
+    // Проходим по всем дням за последние 52 недели (364 дня)
+    for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split('T')[0];
         const month = MONTHS[d.getMonth()];
 
@@ -40,8 +34,9 @@ function createWeeks() {
         }
 
         const square = document.createElement('div');
-        square.className = `square level-${Math.min(Math.floor((yearlyData[dateStr] || 0) / 1), 4)}`;
-        square.title = `${dateStr}: ${yearlyData[dateStr] || 0} задач`;
+        const completedTasks = yearlyData[dateStr] || 0;
+        square.className = `square level-${Math.min(Math.floor(completedTasks / 1), 4)}`;
+        square.title = `${dateStr}: ${completedTasks} задач`;
         currentWeek.appendChild(square);
 
         // Проверяем смену месяца
@@ -56,9 +51,6 @@ function createWeeks() {
             currentMonth = month;
             monthWidth = 0;
         }
-
-        // Останавливаем добавление дней после сегодняшнего
-        if (d.getTime() > today.getTime()) break;
     }
 
     // Добавляем последний месяц
@@ -69,6 +61,8 @@ function createWeeks() {
         monthLabel.textContent = currentMonth;
         months.appendChild(monthLabel);
     }
+
+    console.log('Трекер прогресса отрисован:', { startDate, today, yearlyData });
 }
 
 function renderTasks() {
@@ -95,6 +89,10 @@ function renderTasks() {
         label.appendChild(document.createTextNode(task.name));
         taskElement.appendChild(label);
 
+        if (checkbox.checked) {
+            label.classList.add('checked'); // Добавляем класс checked, если задача уже выполнена
+        }
+
         if (task.subtasks) {
             task.subtasks.forEach((subtask, subIndex) => {
                 const subtaskElement = document.createElement('div');
@@ -116,6 +114,10 @@ function renderTasks() {
                 subLabel.appendChild(document.createTextNode(subtask));
                 subtaskElement.appendChild(subLabel);
                 taskElement.appendChild(subtaskElement);
+
+                if (subCheckbox.checked) {
+                    subLabel.classList.add('checked'); // Добавляем класс checked, если подзадача уже выполнена
+                }
             });
         }
 
