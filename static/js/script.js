@@ -40,9 +40,6 @@ function createWeeks() {
         square.title = `${dateStr}: ${completedTasks} задач`;
         currentWeek.appendChild(square);
 
-        // Отладка: выводим данные в консоль
-        console.log(`Дата: ${dateStr}, Задачи: ${completedTasks}, Уровень: ${level}`);
-
         // Проверяем смену месяца
         if (currentMonth !== month) {
             if (currentMonth !== '') {
@@ -95,34 +92,6 @@ function renderTasks() {
 
         if (checkbox.checked) {
             label.classList.add('checked'); // Добавляем класс checked, если задача уже выполнена
-        }
-
-        if (task.subtasks) {
-            task.subtasks.forEach((subtask, subIndex) => {
-                const subtaskElement = document.createElement('div');
-                subtaskElement.className = 'subtask';
-
-                const subLabel = document.createElement('label');
-                const subCheckbox = document.createElement('input');
-                subCheckbox.type = 'checkbox';
-                subCheckbox.dataset.index = `${index}.${subIndex}`;
-                subCheckbox.checked = progress[`${index}.${subIndex}`] || false;
-
-                subCheckbox.addEventListener('change', () => {
-                    progress[`${index}.${subIndex}`] = subCheckbox.checked;
-                    subLabel.classList.toggle('checked', subCheckbox.checked);
-                    saveProgress();
-                });
-
-                subLabel.appendChild(subCheckbox);
-                subLabel.appendChild(document.createTextNode(subtask));
-                subtaskElement.appendChild(subLabel);
-                taskElement.appendChild(subtaskElement);
-
-                if (subCheckbox.checked) {
-                    subLabel.classList.add('checked'); // Добавляем класс checked, если подзадача уже выполнена
-                }
-            });
         }
 
         tasksContainer.appendChild(taskElement);
@@ -246,19 +215,11 @@ function addTask() {
     const taskInput = document.getElementById('taskInput');
     const taskName = taskInput.value.trim();
     if (taskName) {
-        tasks.push({ name: taskName, subtasks: [] });
-        taskInput.value = '';
-        renderTasks();
-        hideModal('taskManagement');
+        tasks.push({ name: taskName }); // Добавляем задачу без подзадач
+        taskInput.value = ''; // Очищаем поле ввода
+        renderTasks(); // Перерисовываем список задач
+        hideModal('taskManagement'); // Закрываем модальное окно
     }
-}
-
-function addSubtask() {
-    const subtaskInput = document.createElement('input');
-    subtaskInput.type = 'text';
-    subtaskInput.placeholder = 'Название подзадачи';
-    const subtaskContainer = document.getElementById('subtasksContainer');
-    subtaskContainer.appendChild(subtaskInput);
 }
 
 document.addEventListener("DOMContentLoaded", () => {

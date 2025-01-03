@@ -197,16 +197,3 @@ input[type="password"] {
 .task-management-content button:hover {
     background: #eaeef2;
 }
-
-.subtask {
-    margin-left: 20px;
-    margin-bottom: 10px;
-}
-
-.subtask input[type="text"] {
-    width: calc(100% - 30px);
-}
-
-.subtask button {
-    margin-left: 10px;
-}
