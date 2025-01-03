@@ -34,10 +34,14 @@ function createWeeks() {
         }
 
         const square = document.createElement('div');
-        const completedTasks = yearlyData[dateStr] || 0;
-        square.className = `square level-${Math.min(Math.floor(completedTasks / 1), 4)}`;
+        const completedTasks = yearlyData[dateStr] || 0; // Количество выполненных задач
+        const level = Math.min(Math.floor(completedTasks / 1), 4); // Уровень цвета (от 0 до 4)
+        square.className = `square level-${level}`;
         square.title = `${dateStr}: ${completedTasks} задач`;
         currentWeek.appendChild(square);
+
+        // Отладка: выводим данные в консоль
+        console.log(`Дата: ${dateStr}, Задачи: ${completedTasks}, Уровень: ${level}`);
 
         // Проверяем смену месяца
         if (currentMonth !== month) {
